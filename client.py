@@ -4,13 +4,30 @@ import time
 import re
 
 
+def censurer(texte):
+    mots_a_censurer = [
+    "pute", "pouffe", "pouf", "poufiase", "pouffy", "poufyase", "pouffyase",
+    "cul", "enculé", "en cule", "ntm", "nique ta mère", "enfoiré", "pédé",
+    "pd", "salot", "mbdtc", "fu", "fuck", "fucker", "facka", "maddafacka (<3)",
+    "bitch", "biatch", "motherfucker", "fum", "ass", "asshole", "fucking",
+    "fils de pute", "fdp", "bite", "fuckoff", "fuq", "fuqa"
+    ]
+    texte_censure = texte
+    for mot in mots_a_censurer:
+        motif = r"\b" + r"[\W_]*".join(list(mot)) + r"\b"
+        regex = re.compile(motif, re.IGNORECASE)
+        texte_censure = regex.sub(lambda m: "*"*len(m.group()), texte_censure)
+    return texte_censure
+
 class Client():
 
     def __init__(self, username, server, port):
+    def __init__(self, username, mdp, server, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((server, port))
         self.username = username
         self.send("USERNAME {0}".format(username))
+        self.send("USERNAME {0} / MDP {1}".format(username, mdp))
         self.listening = True
 
     def listener(self):
@@ -28,11 +45,16 @@ class Client():
         self.listen_thread.daemon = True
         self.listen_thread.start()
 
+
+    
+
+
     def send(self, message):
         try:
             username_result = re.search('^USERNAME (.*)$', message)
             if not username_result:
                 message = "{0}: {1}".format(self.username, message)
+                message = "{0}: {1}".format(self.username, censurer(message))
             self.socket.sendall(message.encode("UTF-8"))
         except socket.error:
             print("unable to send message")
@@ -52,8 +74,10 @@ class Client():
 if __name__ == "__main__":
     username = input("username: ")
     server = input("server: ")
+    mdp = input("mdp: ")
     port = int(input("port: "))
     client = Client(username, server, port)
+    client = Client(username, mdp , server, port)
     client.listen()
     message = ""
     while message != "QUIT":
