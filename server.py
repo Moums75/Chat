@@ -16,6 +16,7 @@ class Server():
         while True:
             print("Listening new customers")
             try:
+                (client_socket, client_adress) = self.listener.accept()
             except socket.error:
                 sys.exit("Cannot connect clients")
             self.clients_sockets.append(client_socket)
