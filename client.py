@@ -7,10 +7,12 @@ import re
 class Client():
 
     def __init__(self, username, server, port):
+    def __init__(self, username, mdp, server, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((server, port))
         self.username = username
         self.send("USERNAME {0}".format(username))
+        self.send("USERNAME {0} / MDP {1}".format(username, mdp))
         self.listening = True
 
     def listener(self):
@@ -52,8 +54,10 @@ class Client():
 if __name__ == "__main__":
     username = input("username: ")
     server = input("server: ")
+    mdp = input("mdp: ")
     port = int(input("port: "))
     client = Client(username, server, port)
+    client = Client(username, mdp , server, port)
     client.listen()
     message = ""
     while message != "QUIT":

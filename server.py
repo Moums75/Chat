@@ -1,6 +1,7 @@
 import socket
 import sys
 import time
+import re
 from clientthread import ClientListener
 
 class Server():
@@ -15,7 +16,6 @@ class Server():
         while True:
             print("Listening new customers")
             try:
-                (client_socket, client_adress) = self.listener.accept()
             except socket.error:
                 sys.exit("Cannot connect clients")
             self.clients_sockets.append(client_socket)
@@ -23,6 +23,19 @@ class Server():
             client_thread = ClientListener(self, client_socket, client_adress)
             client_thread.start()
             time.sleep(0.1)
+
+            
+            if(re.search('MDP (.*)$', client_socket.recv(1024).decode('UTF-8')).group(1) == "hello"):
+                print("connection")
+                self.clients_sockets.append(client_socket)
+                print("Start the thread for client:", client_adress)
+                client_thread = ClientListener(self, client_socket, client_adress)
+                client_thread.start()
+                time.sleep(0.1)
+            else:
+                print("no connection")
+                client_socket.close()
+                
 
     def remove_socket(self, socket):
         self.clients_sockets.remove(socket)
