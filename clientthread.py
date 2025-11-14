@@ -33,12 +33,16 @@ class ClientListener(threading.Thread):
     def handel_msg(self, data):
         print(self.address, "sent :", data)
         username_result = re.search('^USERNAME (.*)$', data)
+        username_result = re.search('USERNAME\s*(.*?)\s*MDP', data)
+        data2 = re.search(':(.*)$', data).group(1)
         if username_result:
             self.username = username_result.group(1)
             self.server.echo("{0} has joined.\n".format(self.username))
         elif data == "QUIT":
+        elif data2 == " QUIT":
             self.quit()
         elif data =="":
+        elif data2 =="":
             self.quit()
         else:
             self.server.echo(data)

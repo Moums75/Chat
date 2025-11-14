@@ -16,6 +16,7 @@ class Server():
         while True:
             print("Listening new customers")
             try:
+                (client_socket, client_adress) = self.listener.accept()                    
             except socket.error:
                 sys.exit("Cannot connect clients")
             self.clients_sockets.append(client_socket)
@@ -26,6 +27,10 @@ class Server():
 
             
             if(re.search('MDP (.*)$', client_socket.recv(1024).decode('UTF-8')).group(1) == "hello"):
+            data = client_socket.recv(1024).decode('UTF-8')
+            match = re.search(r'MDP\s+(\S+)', data)
+
+            if match and match.group(1) == "hello":
                 print("connection")
                 self.clients_sockets.append(client_socket)
                 print("Start the thread for client:", client_adress)
@@ -35,6 +40,9 @@ class Server():
             else:
                 print("no connection")
                 client_socket.close()
+
+
+
                 
 
     def remove_socket(self, socket):
